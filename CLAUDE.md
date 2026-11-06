@@ -80,4 +80,5 @@ Page code should handle what's on screen and call into Core. If it's working out
 
 - Plain voice in docs and notes: simple sentences, no em dashes.
 - UI ideas shouldn't come from Tandem.
-- Commit or push only when asked. This folder isn't a git repo yet.
+- Commit or push only when asked. The repo is welffi/welffi-hub on GitHub. Commits use the noreply email, so no personal address goes public.
+- The hub downloads welffi animate from the latest release of welffi/welffi-animate. The release asset must stay named `welffi-animate.exe`, with a tag like `v0.2.0`. See `Core\AnimateUpdates.cs`.
