@@ -43,11 +43,13 @@ pub fn data_root() -> PathBuf {
     }
 }
 
+pub const HUB_REPO: &str = "welffi/welffi-hub";
+
+pub fn asset_for(repo: &str) -> String {
+    format!("{}.exe", repo.rsplit('/').next().unwrap_or(repo))
+}
+
 impl Tool {
-    pub fn asset(&self) -> String {
-        let repo = self.repo.unwrap_or_default();
-        format!("{}.exe", repo.rsplit('/').next().unwrap_or(repo))
-    }
 
     fn exe_name(&self) -> String {
         format!("{}.exe", self.name)
@@ -115,8 +117,8 @@ mod tests {
 
     #[test]
     fn asset_comes_from_the_repo_name() {
-        assert_eq!(TOOLS[0].asset(), "welffi-accounts.exe");
-        assert_eq!(TOOLS[1].asset(), "welffi-animate.exe");
+        assert_eq!(asset_for("welffi/welffi-accounts"), "welffi-accounts.exe");
+        assert_eq!(asset_for(HUB_REPO), "welffi-hub.exe");
     }
 
     #[test]

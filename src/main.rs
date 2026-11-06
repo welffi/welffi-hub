@@ -2,6 +2,7 @@
 
 mod home;
 mod programs;
+mod self_update;
 mod theme;
 mod tile;
 mod updates;

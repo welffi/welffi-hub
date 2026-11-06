@@ -1,5 +1,6 @@
-use crate::programs::TOOLS;
-use crate::theme::{self, ACCENT, ACCENT_INK, MUTED};
+use crate::programs::{HUB_REPO, TOOLS};
+use crate::self_update;
+use crate::theme::{self, ACCENT, ACCENT_INK, DANGER, FAINT, MUTED};
 use crate::tile::{self, Status};
 use crate::updates::{self, Latest, Shared};
 use crate::win;
@@ -13,6 +14,7 @@ const MONTHS: [&str; 12] = ["January", "February", "March", "April", "May", "Jun
 
 pub struct Home {
     states: Vec<Shared>,
+    hub: Shared,
 }
 
 fn greeting(hour: u16) -> &'static str {
@@ -31,21 +33,45 @@ fn columns_for(width: f32) -> usize {
 impl Home {
     pub fn new(cc: &eframe::CreationContext) -> Home {
         theme::apply(&cc.egui_ctx);
-        let home = Home { states: TOOLS.iter().map(|_| Shared::default()).collect() };
+        self_update::remove_old_copy();
+        let home = Home { states: TOOLS.iter().map(|_| Shared::default()).collect(), hub: Shared::default() };
         home.check_all(&cc.egui_ctx);
         home
     }
 
     fn check_all(&self, ctx: &egui::Context) {
+        updates::check(HUB_REPO, self.hub.clone(), ctx.clone());
         for (tool, state) in TOOLS.iter().zip(&self.states) {
-            if tool.repo.is_some() {
-                updates::check(tool, state.clone(), ctx.clone());
+            if let Some(repo) = tool.repo {
+                updates::check(repo, state.clone(), ctx.clone());
             }
         }
     }
 
     fn checking(&self) -> bool {
-        self.states.iter().any(|state| matches!(state.lock().unwrap().latest, Latest::Checking))
+        self.states.iter().chain(Some(&self.hub)).any(|state| matches!(state.lock().unwrap().latest, Latest::Checking))
+    }
+
+    fn hub_update(&self, ui: &mut egui::Ui) {
+        let (downloading, progress, release, error) = {
+            let hub = self.hub.lock().unwrap();
+            (hub.downloading, hub.progress, self_update::available(&hub).cloned(), hub.error.clone())
+        };
+        if downloading {
+            let text = progress.map_or("Updating...".to_string(), |done| format!("Updating {:.0}%", done * 100.0));
+            ui.label(RichText::new(text).size(13.0).color(ACCENT));
+        } else if let Some(release) = release {
+            let label = RichText::new(format!("Update to {}", release.tag)).family(theme::semibold()).size(13.0).color(ACCENT_INK);
+            let button = egui::Button::new(label).fill(ACCENT).corner_radius(CornerRadius::same(14)).min_size(Vec2::new(0.0, 28.0));
+            let response = ui.add(button);
+            if response.clicked() {
+                self_update::install(release, self.hub.clone(), ui.ctx().clone());
+            }
+            response.on_hover_cursor(CursorIcon::PointingHand);
+        }
+        if let Some(error) = error {
+            ui.label(RichText::new(error).size(13.0).color(DANGER));
+        }
     }
 
     fn header(&self, ui: &mut egui::Ui) {
@@ -55,6 +81,7 @@ impl Home {
             theme::centered_text(ui.painter(), mark.center(), "w", FontId::new(18.0, theme::semibold()), ACCENT_INK);
             ui.add_space(6.0);
             ui.label(RichText::new(win::TITLE).family(theme::semibold()).size(16.0));
+            ui.label(RichText::new(format!("v{}", self_update::VERSION)).size(12.0).color(FAINT));
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 let checking = self.checking();
                 let label = if checking { "Checking for updates..." } else { "Check for updates" };
@@ -64,6 +91,8 @@ impl Home {
                     self.check_all(ui.ctx());
                 }
                 response.on_hover_cursor(CursorIcon::PointingHand);
+                ui.add_space(12.0);
+                self.hub_update(ui);
             });
         });
     }

@@ -11,6 +11,7 @@ The account manager is moving out into its own program, welffi accounts (repo we
 - Build: `cargo build`
 - Checks: `cargo test`
 - Release: `build.bat`, which makes `dist\welffi hub.exe`. Close the hub first, since a running exe can't be replaced.
+- Publish: raise `version` in `Cargo.toml`, run `build.bat`, then make a GitHub release on welffi/welffi-hub with a tag like `v0.2.0`. Upload `dist\welffi hub.exe` named `welffi-hub.exe`. Running hubs see it and offer "Update to v0.2.0". The hub compares the tag with its own `Cargo.toml` version, so the two must match. See `src\self_update.rs`.
 - Old C# hub: `"C:\Program Files\dotnet\dotnet.exe" build src\whub\whub.csproj`
 
 ## Testing

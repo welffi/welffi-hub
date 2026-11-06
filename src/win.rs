@@ -1,4 +1,5 @@
-use windows_sys::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError, SYSTEMTIME};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use windows_sys::Win32::Foundation::{CloseHandle, ERROR_ALREADY_EXISTS, GetLastError, HANDLE, SYSTEMTIME};
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::System::Threading::CreateMutexW;
 use windows_sys::Win32::UI::WindowsAndMessaging::{FindWindowW, IsIconic, SW_RESTORE, SetForegroundWindow, ShowWindow};
@@ -9,11 +10,21 @@ fn wide(text: &str) -> Vec<u16> {
     text.encode_utf16().chain(Some(0)).collect()
 }
 
+static INSTANCE: AtomicUsize = AtomicUsize::new(0);
+
 pub fn claim_single_instance() -> bool {
     let name = wide("welffi_hub_single_instance");
     unsafe {
-        CreateMutexW(std::ptr::null(), 1, name.as_ptr());
+        let handle = CreateMutexW(std::ptr::null(), 1, name.as_ptr());
+        INSTANCE.store(handle as usize, Ordering::SeqCst);
         GetLastError() != ERROR_ALREADY_EXISTS
+    }
+}
+
+pub fn release_single_instance() {
+    let handle = INSTANCE.swap(0, Ordering::SeqCst);
+    if handle != 0 {
+        unsafe { CloseHandle(handle as HANDLE) };
     }
 }
 

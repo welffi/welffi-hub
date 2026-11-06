@@ -1,4 +1,4 @@
-use crate::programs::{Release, Tool, is_newer, parse_release};
+use crate::programs::{Release, Tool, asset_for, is_newer, parse_release};
 use eframe::egui;
 use rfd::{MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
 use std::fs::{self, File};
@@ -33,11 +33,11 @@ fn get(url: &str) -> Result<ureq::http::Response<ureq::Body>, ureq::Error> {
     agent.get(url).header("User-Agent", "welffi-hub").call()
 }
 
-fn fetch_latest(tool: &Tool) -> Latest {
-    let url = format!("https://api.github.com/repos/{}/releases/latest", tool.repo.unwrap_or_default());
+fn fetch_latest(repo: &str) -> Latest {
+    let url = format!("https://api.github.com/repos/{repo}/releases/latest");
     match get(&url) {
         Ok(mut response) => match response.body_mut().read_to_string() {
-            Ok(json) => parse_release(&json, &tool.asset()).map_or(Latest::NotReleased, Latest::Found),
+            Ok(json) => parse_release(&json, &asset_for(repo)).map_or(Latest::NotReleased, Latest::Found),
             Err(_) => Latest::Offline,
         },
         Err(ureq::Error::StatusCode(404)) => Latest::NotReleased,
@@ -45,14 +45,14 @@ fn fetch_latest(tool: &Tool) -> Latest {
     }
 }
 
-pub fn check(tool: &'static Tool, state: Shared, ctx: egui::Context) {
+pub fn check(repo: &'static str, state: Shared, ctx: egui::Context) {
     {
         let mut current = state.lock().unwrap();
         current.latest = Latest::Checking;
         current.error = None;
     }
     thread::spawn(move || {
-        let latest = fetch_latest(tool);
+        let latest = fetch_latest(repo);
         state.lock().unwrap().latest = latest;
         ctx.request_repaint();
     });
@@ -97,11 +97,7 @@ fn ask_to_update(tool: &Tool, tag: &str) -> MessageDialogResult {
 }
 
 fn install_and_open(tool: &'static Tool, release: Release, state: Shared, ctx: egui::Context) {
-    {
-        let mut current = state.lock().unwrap();
-        current.downloading = true;
-        current.progress = None;
-    }
+    begin_download(&state);
     thread::spawn(move || {
         let result = download(tool, &release, &state, &ctx).and_then(|()| launch(tool, &tool.installed_exe()));
         let mut current = state.lock().unwrap();
@@ -110,6 +106,21 @@ fn install_and_open(tool: &'static Tool, release: Release, state: Shared, ctx: e
         current.error = result.err();
         ctx.request_repaint();
     });
+}
+
+pub fn begin_download(state: &Shared) {
+    let mut current = state.lock().unwrap();
+    current.downloading = true;
+    current.progress = None;
+    current.error = None;
+}
+
+pub fn fetch_to(url: &str, temp: &Path, state: &Shared, ctx: &egui::Context) -> bool {
+    let saved = get(url).is_ok_and(|mut response| save_body(&mut response, temp, state, ctx).is_ok());
+    if !saved {
+        let _ = fs::remove_file(temp);
+    }
+    saved
 }
 
 fn save_body(response: &mut ureq::http::Response<ureq::Body>, temp: &Path, state: &Shared, ctx: &egui::Context) -> io::Result<()> {
@@ -137,10 +148,8 @@ fn download(tool: &Tool, release: &Release, state: &Shared, ctx: &egui::Context)
     let exe = tool.installed_exe();
     fs::create_dir_all(exe.parent().unwrap()).map_err(failed)?;
     let temp = exe.with_extension("exe.download");
-    let mut response = get(&release.url).map_err(|_| format!("Couldn't download {}.", tool.name))?;
-    if let Err(error) = save_body(&mut response, &temp, state, ctx) {
-        let _ = fs::remove_file(&temp);
-        return Err(failed(error));
+    if !fetch_to(&release.url, &temp, state, ctx) {
+        return Err(format!("Couldn't download {}.", tool.name));
     }
     if fs::rename(&temp, &exe).is_err() {
         let _ = fs::remove_file(&temp);
