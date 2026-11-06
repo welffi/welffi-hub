@@ -3,6 +3,7 @@
 mod home;
 mod programs;
 mod self_update;
+mod shortcuts;
 mod theme;
 mod tile;
 mod updates;

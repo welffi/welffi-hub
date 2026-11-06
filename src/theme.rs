@@ -71,19 +71,5 @@ fn add_system_font(fonts: &mut FontDefinitions, file: &str, family: FontFamily) 
 }
 
 pub fn window_icon() -> IconData {
-    const SIZE: u32 = 64;
-    const RADIUS: f32 = 14.0;
-    let half = SIZE as f32 / 2.0;
-    let rgba = (0..SIZE * SIZE)
-        .flat_map(|index| {
-            let x = (index % SIZE) as f32 + 0.5 - half;
-            let y = (index / SIZE) as f32 + 0.5 - half;
-            let dx = x.abs() - (half - RADIUS);
-            let dy = y.abs() - (half - RADIUS);
-            let outside = dx.max(0.0).hypot(dy.max(0.0)) + dx.max(dy).min(0.0) - RADIUS;
-            let alpha = ((0.5 - outside).clamp(0.0, 1.0) * 255.0) as u8;
-            [ACCENT.r(), ACCENT.g(), ACCENT.b(), alpha]
-        })
-        .collect();
-    IconData { rgba, width: SIZE, height: SIZE }
+    IconData { rgba: include_bytes!("../assets/icon64.rgba").to_vec(), width: 64, height: 64 }
 }

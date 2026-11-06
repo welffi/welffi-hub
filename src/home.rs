@@ -1,5 +1,6 @@
 use crate::programs::{HUB_REPO, TOOLS};
 use crate::self_update;
+use crate::shortcuts;
 use crate::theme::{self, ACCENT, ACCENT_INK, DANGER, FAINT, MUTED};
 use crate::tile::{self, Status};
 use crate::updates::{self, Latest, Shared};
@@ -34,6 +35,7 @@ impl Home {
     pub fn new(cc: &eframe::CreationContext) -> Home {
         theme::apply(&cc.egui_ctx);
         self_update::remove_old_copy();
+        shortcuts::refresh();
         let home = Home { states: TOOLS.iter().map(|_| Shared::default()).collect(), hub: Shared::default() };
         home.check_all(&cc.egui_ctx);
         home

@@ -1,4 +1,5 @@
 use crate::programs::{Release, Tool, asset_for, is_newer, parse_release};
+use crate::shortcuts;
 use eframe::egui;
 use rfd::{MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
 use std::fs::{self, File};
@@ -99,7 +100,7 @@ fn ask_to_update(tool: &Tool, tag: &str) -> MessageDialogResult {
 fn install_and_open(tool: &'static Tool, release: Release, state: Shared, ctx: egui::Context) {
     begin_download(&state);
     thread::spawn(move || {
-        let result = download(tool, &release, &state, &ctx).and_then(|()| launch(tool, &tool.installed_exe()));
+        let result = download(tool, &release, &state, &ctx).inspect(|()| shortcuts::refresh()).and_then(|()| launch(tool, &tool.installed_exe()));
         let mut current = state.lock().unwrap();
         current.downloading = false;
         current.progress = None;

@@ -12,6 +12,8 @@ The account manager is moving out into its own program, welffi accounts (repo we
 - Checks: `cargo test`
 - Release: `build.bat`, which makes `dist\welffi hub.exe`. Close the hub first, since a running exe can't be replaced.
 - Publish: raise `version` in `Cargo.toml`, run `build.bat`, then make a GitHub release on welffi/welffi-hub with a tag like `v0.2.0`. Upload `dist\welffi hub.exe` named `welffi-hub.exe`. Running hubs see it and offer "Update to v0.2.0". The hub compares the tag with its own `Cargo.toml` version, so the two must match. See `src\self_update.rs`.
+- The exe icon is `assets\hub.ico`. `build.rs` adds it with `rc.exe` from the Windows SDK. The window icon is `assets\icon64.rgba`.
+- On start and after each install, the hub writes Start menu shortcuts for itself and every program it finds (`src\shortcuts.rs`). It skips this when `WHUB_DATA` is set, so test runs don't move them.
 - Old C# hub: `"C:\Program Files\dotnet\dotnet.exe" build src\whub\whub.csproj`
 
 ## Testing
