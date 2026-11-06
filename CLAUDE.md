@@ -1,14 +1,17 @@
 # welffi hub (whub)
 
-A native Windows hub for all of welffi's programs. C#, .NET 10, WPF. Each program is a tool inside the hub. So far: Home and the Account Manager. Macros move over from AutoHotkey later.
+A native Windows hub for all of welffi's programs. Rust and egui, like welffi animate. The hub is a launcher: each program has its own repo, and the hub downloads, updates and opens it. The tool list is `TOOLS` in `src\programs.rs`.
+
+The account manager is moving out into its own program, welffi accounts (repo welffi/welffi-accounts, asset `welffi-accounts.exe`). Until that's done, the old C# hub stays in `src\whub` and `tests\Whub.Checks` as the source to port from. Delete it, `whub.sln` and the C# notes below once welffi accounts works.
 
 ## Commands
 
-`dotnet` may not be on PATH. If so, use `C:\Program Files\dotnet\dotnet.exe`.
+`cargo` may not be on PATH. If so, use `%USERPROFILE%\.cargo\bin\cargo.exe`.
 
-- Build: `dotnet build src\whub\whub.csproj`
-- Checks: `dotnet run --project tests\Whub.Checks\Whub.Checks.csproj`
-- Release: `build.bat`, which makes `dist\whub.exe`. Close the hub first, since a running exe can't be replaced.
+- Build: `cargo build`
+- Checks: `cargo test`
+- Release: `build.bat`, which makes `dist\welffi hub.exe`. Close the hub first, since a running exe can't be replaced.
+- Old C# hub: `"C:\Program Files\dotnet\dotnet.exe" build src\whub\whub.csproj`
 
 ## Testing
 
