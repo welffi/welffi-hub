@@ -6,7 +6,7 @@ pub struct Tool {
     pub name: &'static str,
     pub blurb: &'static str,
     pub icon: char,
-    pub repo: Option<&'static str>,
+    pub repo: &'static str,
 }
 
 pub static TOOLS: [Tool; 3] = [
@@ -14,19 +14,19 @@ pub static TOOLS: [Tool; 3] = [
         name: "welffi accounts",
         blurb: "Log in to your Roblox accounts and launch them together.",
         icon: '\u{E716}',
-        repo: Some("welffi/welffi-accounts"),
+        repo: "welffi/welffi-accounts",
     },
     Tool {
         name: "welffi animate",
         blurb: "Animate Roblox rigs and copy them straight into Studio.",
         icon: '\u{E714}',
-        repo: Some("welffi/welffi-animate"),
+        repo: "welffi/welffi-animate",
     },
     Tool {
-        name: "Macros",
-        blurb: "Record and play back macros. Moving over from AutoHotkey later.",
+        name: "welffi macros",
+        blurb: "Run the CTD loop, or record your inputs and play them back.",
         icon: '\u{E945}',
-        repo: None,
+        repo: "welffi/welffi-macros",
     },
 ];
 

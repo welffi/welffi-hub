@@ -8,7 +8,6 @@ const PAD: f32 = 20.0;
 const ICON: f32 = 44.0;
 
 pub enum Status {
-    ComingLater,
     Checking,
     Installed,
     Update(String),
@@ -20,9 +19,6 @@ pub enum Status {
 
 impl Status {
     pub fn of(tool: &Tool, state: &ProgramState) -> Status {
-        if tool.repo.is_none() {
-            return Status::ComingLater;
-        }
         if state.downloading {
             return Status::Downloading(state.progress);
         }
@@ -44,7 +40,6 @@ impl Status {
 
     fn label(&self) -> String {
         match self {
-            Status::ComingLater => "Coming later".into(),
             Status::Checking => "Checking".into(),
             Status::Installed => "Installed".into(),
             Status::Update(tag) => format!("{tag} is out"),
@@ -62,7 +57,7 @@ impl Status {
             Status::Update(_) | Status::Downloading(_) => ACCENT,
             Status::Available(_) => TEXT,
             Status::Checking | Status::Offline => MUTED,
-            Status::NotOut | Status::ComingLater => FAINT,
+            Status::NotOut => FAINT,
         }
     }
 
@@ -81,10 +76,7 @@ pub fn show(ui: &mut egui::Ui, tool: &Tool, status: &Status, error: Option<&str>
     let (rect, response) = ui.allocate_exact_size(Vec2::new(width, TILE_HEIGHT), sense);
     let hover = ui.ctx().animate_bool_with_time(response.id, action.is_some() && response.hovered(), 0.14);
     let card = rect.translate(Vec2::new(0.0, -3.0 * hover));
-    let mut painter = ui.painter().clone();
-    if matches!(status, Status::ComingLater) {
-        painter.multiply_opacity(0.55);
-    }
+    let painter = ui.painter().clone();
 
     let radius = CornerRadius::same(16);
     if hover > 0.0 {
@@ -124,10 +116,8 @@ pub fn show(ui: &mut egui::Ui, tool: &Tool, status: &Status, error: Option<&str>
 }
 
 fn icon(painter: &Painter, rect: Rect, tool: &Tool, hover: f32) {
-    let live = tool.repo.is_some();
-    let fill = if live { ACCENT_SOFT.lerp_to_gamma(ACCENT_LINE, hover * 0.6) } else { RAISED };
-    painter.rect_filled(rect, CornerRadius::same(12), fill);
-    theme::centered_text(painter, rect.center(), tool.icon, FontId::new(20.0, theme::icons()), if live { ACCENT } else { MUTED });
+    painter.rect_filled(rect, CornerRadius::same(12), ACCENT_SOFT.lerp_to_gamma(ACCENT_LINE, hover * 0.6));
+    theme::centered_text(painter, rect.center(), tool.icon, FontId::new(20.0, theme::icons()), ACCENT);
 }
 
 fn pill(painter: &Painter, right_top: Pos2, status: &Status) {

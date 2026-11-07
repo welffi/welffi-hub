@@ -44,9 +44,7 @@ impl Home {
     fn check_all(&self, ctx: &egui::Context) {
         updates::check(HUB_REPO, self.hub.clone(), ctx.clone());
         for (tool, state) in TOOLS.iter().zip(&self.states) {
-            if let Some(repo) = tool.repo {
-                updates::check(repo, state.clone(), ctx.clone());
-            }
+            updates::check(tool.repo, state.clone(), ctx.clone());
         }
     }
 
@@ -106,7 +104,7 @@ impl Home {
         let date = format!("{}, {} {}", DAYS[now.wDayOfWeek as usize % 7], MONTHS[(now.wMonth as usize).clamp(1, 12) - 1], now.wDay);
         let installed = statuses.iter().filter(|(status, _)| status.is_installed()).count();
         let updates = statuses.iter().filter(|(status, _)| matches!(status, Status::Update(_))).count();
-        let programs = TOOLS.iter().filter(|tool| tool.repo.is_some()).count();
+        let programs = TOOLS.len();
         ui.horizontal(|ui| {
             ui.label(RichText::new(format!("{date}   ·   {installed} of {programs} tools installed")).color(MUTED).size(14.0));
             if updates > 0 {

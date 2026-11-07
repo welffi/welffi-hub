@@ -6,7 +6,7 @@ a little hub of some vibecoded programs i've made to make my life a little easie
 
 - **[welffi accounts](https://github.com/welffi/welffi-accounts)**: log in to your roblox accounts and launch them together
 - **[welffi animate](https://github.com/welffi/welffi-animate)**: a roblox r6 animator
-- **macros**: coming later
+- **[welffi macros](https://github.com/welffi/welffi-macros)**: the ctd loop, plus a recorder for your own inputs
 
 ## how to download
 

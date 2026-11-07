@@ -44,6 +44,7 @@ When running the hub for a test, set `WHUB_DATA` to a scratch folder. Only one h
 - Each program's release asset name and tag style must stay the same, or the hub can't find it. Tags look like `v0.2.0`.
 - welffi accounts: latest release of welffi/welffi-accounts, asset `welffi-accounts.exe`.
 - welffi animate: latest release of welffi/welffi-animate, asset `welffi-animate.exe`.
+- welffi macros: latest release of welffi/welffi-macros, asset `welffi-macros.exe`.
 
 ## Style for welffi
 
