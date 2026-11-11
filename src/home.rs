@@ -185,6 +185,6 @@ mod tests {
         assert_eq!(columns_for(200.0), 1);
         assert_eq!(columns_for(640.0), 2);
         assert_eq!(columns_for(920.0), 3);
-        assert_eq!(columns_for(4000.0), 3);
+        assert_eq!(columns_for(4000.0), crate::programs::TOOLS.len());
     }
 }

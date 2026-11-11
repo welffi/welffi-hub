@@ -45,6 +45,7 @@ When running the hub for a test, set `WHUB_DATA` to a scratch folder. Only one h
 - welffi accounts: latest release of welffi/welffi-accounts, asset `welffi-accounts.exe`.
 - welffi animate: latest release of welffi/welffi-animate, asset `welffi-animate.exe`.
 - welffi macros: latest release of welffi/welffi-macros, asset `welffi-macros.exe`.
+- welffi chest: latest release of welffi/welffi-chest, asset `welffi-chest.exe`.
 
 ## Style for welffi
 
