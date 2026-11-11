@@ -9,7 +9,7 @@ pub struct Tool {
     pub repo: &'static str,
 }
 
-pub static TOOLS: [Tool; 4] = [
+pub static TOOLS: [Tool; 5] = [
     Tool {
         name: "welffi accounts",
         blurb: "Log in to your Roblox accounts and launch them together.",
@@ -33,6 +33,12 @@ pub static TOOLS: [Tool; 4] = [
         blurb: "Count your Fortnite chests and track the odds of Pirate Shop Access.",
         icon: '\u{E7B8}',
         repo: "welffi/welffi-chest",
+    },
+    Tool {
+        name: "Tandem",
+        blurb: "Play videos with every audio track at once, and edit them.",
+        icon: '\u{E8B2}',
+        repo: "welffi/tandem",
     },
 ];
 

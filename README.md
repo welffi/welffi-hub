@@ -8,6 +8,7 @@ a little hub of some vibecoded programs i've made to make my life a little easie
 - **[welffi animate](https://github.com/welffi/welffi-animate)**: a roblox r6 animator
 - **[welffi macros](https://github.com/welffi/welffi-macros)**: simple prebuilt macros and a recorder
 - **[welffi chest](https://github.com/welffi/welffi-chest)**: count your fortnite chests and track your odds, with a small overlay
+- **[tandem](https://github.com/welffi/tandem)**: play videos with every audio track at once, and edit them
 
 ## how to download
 
