@@ -24,7 +24,7 @@ pub static TOOLS: [Tool; 4] = [
     },
     Tool {
         name: "welffi macros",
-        blurb: "Run the CTD loop, or record your inputs and play them back.",
+        blurb: "Simple prebuilt macros and a recorder for your own.",
         icon: '\u{E945}',
         repo: "welffi/welffi-macros",
     },
